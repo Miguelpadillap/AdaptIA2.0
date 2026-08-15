@@ -1,0 +1,114 @@
+{
+  "entities": {
+    "Teacher": {
+      "title": "Teacher",
+      "description": "Teacher profile information and settings",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 120 },
+        "email": { "type": "string", "maxLength": 120 },
+        "school": { "type": "string", "maxLength": 150 },
+        "avatar": { "type": "string", "maxLength": 500 },
+        "createdAt": { "type": "string", "maxLength": 60 }
+      },
+      "required": ["id", "name", "email", "createdAt"]
+    },
+    "Course": {
+      "title": "Course",
+      "description": "Class or academic subject created by a teacher",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "code": { "type": "string", "maxLength": 50 },
+        "name": { "type": "string", "maxLength": 150 },
+        "grade": { "type": "string", "maxLength": 100 },
+        "description": { "type": "string", "maxLength": 500 },
+        "teacherId": { "type": "string", "maxLength": 128 },
+        "teacherName": { "type": "string", "maxLength": 120 },
+        "accentColor": { "type": "string", "maxLength": 30 },
+        "createdAt": { "type": "string", "maxLength": 60 }
+      },
+      "required": ["id", "code", "name", "grade", "teacherId", "teacherName", "createdAt"]
+    },
+    "Student": {
+      "title": "Student",
+      "description": "Student diagnosed with VARK learning style and enrolled in courses",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 120 },
+        "email": { "type": "string", "maxLength": 120 },
+        "avatar": { "type": "string", "maxLength": 500 },
+        "enrolledCourseIds": { "type": "array" },
+        "learningStyle": {
+          "type": "string",
+          "enum": ["visual", "auditivo", "kinestesico", "lectoescritura"]
+        },
+        "profile": { "type": "object" },
+        "enrolledAt": { "type": "string", "maxLength": 60 }
+      },
+      "required": ["id", "name", "learningStyle", "enrolledAt"]
+    },
+    "TopicResource": {
+      "title": "TopicResource",
+      "description": "Educational unit with 4 adapted VARK learning style variations",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "courseId": { "type": "string", "maxLength": 128 },
+        "teacherId": { "type": "string", "maxLength": 128 },
+        "topicTitle": { "type": "string", "maxLength": 200 },
+        "specificFocus": { "type": "string", "maxLength": 500 },
+        "status": { "type": "string", "enum": ["draft", "published"] },
+        "createdAt": { "type": "string", "maxLength": 60 },
+        "updatedAt": { "type": "string", "maxLength": 60 },
+        "publishedAt": { "type": "string", "maxLength": 60 },
+        "styles": { "type": "object" },
+        "modificationHistory": { "type": "object" }
+      },
+      "required": ["id", "courseId", "teacherId", "topicTitle", "status", "createdAt", "styles"]
+    },
+    "StudentProgress": {
+      "title": "StudentProgress",
+      "description": "Student activity completion and quiz scoring for a topic",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "studentId": { "type": "string", "maxLength": 128 },
+        "courseId": { "type": "string", "maxLength": 128 },
+        "topicId": { "type": "string", "maxLength": 128 },
+        "completed": { "type": "boolean" },
+        "quizScore": { "type": "number" },
+        "quizTotal": { "type": "number" },
+        "quizAnswers": { "type": "object" },
+        "timeSpentMinutes": { "type": "number" },
+        "lastAccessed": { "type": "string", "maxLength": 60 },
+        "studentNotes": { "type": "string", "maxLength": 1000 }
+      },
+      "required": ["studentId", "courseId", "topicId", "completed", "quizScore", "quizTotal", "lastAccessed"]
+    }
+  },
+  "firestore": {
+    "/teachers/{teacherId}": {
+      "schema": "Teacher",
+      "description": "Registered teacher profile information"
+    },
+    "/courses/{courseId}": {
+      "schema": "Course",
+      "description": "Course information created by teachers"
+    },
+    "/students/{studentId}": {
+      "schema": "Student",
+      "description": "Student VARK profiles and enrollment records"
+    },
+    "/topics/{topicId}": {
+      "schema": "TopicResource",
+      "description": "Curricular topics with 4 multi-style adaptive learning resources"
+    },
+    "/progress/{progressId}": {
+      "schema": "StudentProgress",
+      "description": "Student topic progress and quiz performance records"
+    }
+  }
+}

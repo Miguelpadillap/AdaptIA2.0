@@ -1,0 +1,6 @@
+{
+  "name": "adaptIA",
+  "description": "Plataforma educativa con IA para profesores que adapta recursos y contenidos pedagógicos a los estilos de aprendizaje únicos de cada estudiante.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
