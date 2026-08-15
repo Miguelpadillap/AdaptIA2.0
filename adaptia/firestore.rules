@@ -1,0 +1,89 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Default deny all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Test connection doc
+    match /test/{testId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Teachers collection
+    match /teachers/{teacherId} {
+      allow read: if true;
+      allow create, update: if isValidId(teacherId)
+        && incoming().id is string && incoming().id.size() <= 128
+        && incoming().name is string && incoming().name.size() <= 120
+        && incoming().email is string && incoming().email.size() <= 120;
+      allow delete: if false;
+    }
+
+    // Courses collection (public read for students with course link/code, write by creators)
+    match /courses/{courseId} {
+      allow read: if true;
+      allow create, update: if isValidId(courseId)
+        && incoming().id is string && incoming().id.size() <= 128
+        && incoming().code is string && incoming().code.size() <= 50
+        && incoming().name is string && incoming().name.size() <= 150
+        && incoming().grade is string && incoming().grade.size() <= 100
+        && incoming().teacherId is string && incoming().teacherId.size() <= 128;
+      allow delete: if isValidId(courseId);
+    }
+
+    // Students collection (enrolled students with VARK profile)
+    match /students/{studentId} {
+      allow read: if true;
+      allow create, update: if isValidId(studentId)
+        && incoming().id is string && incoming().id.size() <= 128
+        && incoming().name is string && incoming().name.size() <= 120
+        && incoming().learningStyle in ['visual', 'auditivo', 'kinestesico', 'lectoescritura'];
+      allow delete: if false;
+    }
+
+    // Topics & Multi-Style Resources
+    match /topics/{topicId} {
+      allow read: if true;
+      allow create, update: if isValidId(topicId)
+        && incoming().id is string && incoming().id.size() <= 128
+        && incoming().courseId is string && incoming().courseId.size() <= 128
+        && incoming().topicTitle is string && incoming().topicTitle.size() <= 200
+        && incoming().status in ['draft', 'published'];
+      allow delete: if isValidId(topicId);
+    }
+
+    // Student Progress & Quiz scoring
+    match /progress/{progressId} {
+      allow read: if true;
+      allow create, update: if isValidId(progressId)
+        && incoming().studentId is string && incoming().studentId.size() <= 128
+        && incoming().courseId is string && incoming().courseId.size() <= 128
+        && incoming().topicId is string && incoming().topicId.size() <= 128
+        && incoming().completed is bool
+        && incoming().quizScore is number
+        && incoming().quizTotal is number;
+      allow delete: if false;
+    }
+  }
+}
